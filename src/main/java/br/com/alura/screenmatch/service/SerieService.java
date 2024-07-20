@@ -2,6 +2,7 @@ package br.com.alura.screenmatch.service;
 
 import br.com.alura.screenmatch.dto.EpisodioDTO;
 import br.com.alura.screenmatch.dto.SerieDTO;
+import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.model.Serie;
 import br.com.alura.screenmatch.repository.SerieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class SerieService {
     public SerieDTO obterPorId(Long id) {
         Optional<Serie> serieEncontrada = repositorio.findById(id);
 
-        if(serieEncontrada.isPresent()) {
+        if (serieEncontrada.isPresent()) {
             Serie serie = serieEncontrada.get();
             return new SerieDTO(serie.getId(), serie.getTitulo(), serie.getTotalTemporadas(), serie.getAvaliacao(), serie.getGenero(), serie.getAtores(), serie.getPoster(), serie.getSinopse());
         }
@@ -41,13 +42,19 @@ public class SerieService {
     public List<EpisodioDTO> obterTodasAsTemporadas(Long id) {
         Optional<Serie> serieEncontrada = repositorio.findById(id);
 
-        if(serieEncontrada.isPresent()) {
+        if (serieEncontrada.isPresent()) {
             Serie serie = serieEncontrada.get();
             return serie.getEpisodios().stream()
                     .map(episodio -> new EpisodioDTO(episodio.getTemporada(), episodio.getNumeroEpisodio(), episodio.getTitulo()))
                     .collect(Collectors.toList());
         }
         return null;
+    }
+
+    public List<EpisodioDTO> obterTemporadasPorNumero(Long id, Long temporada) {
+        return repositorio.obterEpisodiosPorTemporada(id, temporada).stream()
+                .map(episodio -> new EpisodioDTO(episodio.getTemporada(), episodio.getNumeroEpisodio(), episodio.getTitulo()))
+                .collect(Collectors.toList());
     }
 
     private List<SerieDTO> converteDados(List<Serie> series) {
